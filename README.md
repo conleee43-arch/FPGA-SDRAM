@@ -150,9 +150,9 @@ BANK7：A3=C14，A2=D14，A4=A14，**CLK=B14**（PLL2 CLKOUTp 专用时钟输出
 
 | 参数 | 手册 -6 值 | 本工程实际等待 | 结论 |
 |---|---|---|---|
-| tRCD | 15ns | T_RCD_NS=18 → 有效约 40ns | ✓ 2.6 倍余量 |
-| tRP | 15ns | T_RP_NS=18 → 有效约 40ns | ✓ |
-| tRC | 60ns | T_RC_NS=60 → ACT 到 ACT 有效约 100ns | ✓ |
+| tRCD | 15ns | T_RCD_NS=18 → 有效约 30ns（3 拍） | ✓ 2 倍余量 |
+| tRP | 15ns | T_RP_NS=18 → 有效约 30ns（3 拍） | ✓ |
+| tRC | 60ns | T_RC_NS=60 → ACT 到 ACT 有效约 90ns（9 拍） | ✓ |
 | tRFC（=tRC） | 60ns | T_RFC_NS=80 → 有效约 90ns+ | ✓ |
 | tRAS | 42ns min | 写 60ns / 读 70ns（auto-precharge） | ✓ |
 | tWR | 2tCK | 由 tRC 全程覆盖（WRITE→下次 ACT 60ns ≥ 35ns） | ✓ |
@@ -177,4 +177,3 @@ BANK7：A3=C14，A2=D14，A4=A14，**CLK=B14**（PLL2 CLKOUTp 专用时钟输出
 
 - 单字访问约 9 时钟（90ns），连续读写约 11M 字/s ≈ 22MB/s（16 位）。
 - 刷新开销：每 7.8µs 占用 9 个时钟，约 1.2%。
->>>>>>> 6ab2e93 (Initial commit: EP4CE10 + W9825G6KH-6 SDRAM Controller)

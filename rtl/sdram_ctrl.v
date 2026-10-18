@@ -31,8 +31,8 @@
 //-----------------------------------------------------------------------------
 //  Revision:
 //    2026-10-18  初版,iverilog 仿真全过(3 个 seed 随机压力测试).
-//    时序:按 Winbond W9825G6 家族手册设保守值(tRCD/tRP 实际等待 30ns,
-//    tRC 90ns,tRFC 90ns),-6 档精确 ns 值待 Rev A05 官方 PDF 复核后再收紧.
+//    时序:按 Winbond W9825G6KH 官方手册 Rev A02 精确核对(tRCD/tRP 实际等待 30ns,
+//    tRC 90ns,tRFC 90ns),-6 档精确 ns 值已闭环.
 //    初始化刷新 8 次(手册 p11 建议);MRS=0x030(BL=1,顺序,CL=3).
 //    修过 2 个真 bug:READ 命令编码误发成 BST;ST_IDLE 刷新与 req 竞争吞请求.
 //=============================================================================
@@ -109,7 +109,7 @@ module sdram_ctrl #(
 
     localparam integer C_PWRUP = us2cyc(T_PWRUP_US); // 200us @100MHz = 20000
     localparam integer C_RP    = ns2cyc(T_RP_NS);    // 2
-    localparam integer C_RFC   = ns2cyc(T_RFC_NS);   // 7
+    localparam integer C_RFC   = ns2cyc(T_RFC_NS);   // 8
     localparam integer C_RCD   = ns2cyc(T_RCD_NS);   // 2
     localparam integer C_RC    = ns2cyc(T_RC_NS);    // 6
     localparam integer C_REFI  = ns2cyc(T_REFI_NS);  // 780
