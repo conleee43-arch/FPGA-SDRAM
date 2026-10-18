@@ -12,19 +12,23 @@ FPGA 为 Altera Cyclone IV E（EP4CE10F17C8），SDRAM 为 Winbond W9825G6KH-6
 ```
 sdram-controller/
 ├── rtl/
-│   ├── sdram_ctrl.v      # 控制器本体（native 接口，时序全参数化）
-│   ├── sdram_top.v       # 板级顶层：PLL + 控制器 + 自检 + LED
-│   └── sdram_selftest.v  # 上电自检/连续压力测试（LFSR 数据，多 bank 轮询）
+│   ├── sdram_ctrl.v         # 控制器本体（native 接口，时序全参数化）
+│   ├── sdram_top.v          # 板级顶层：PLL + 控制器 + 自检 + LED + UART
+│   ├── sdram_selftest.v     # 上电自检/连续压力测试（LFSR 数据，多 bank 轮询）
+│   ├── sdram_pll.v          # ALTPLL 模块（50MHz -> 100MHz c0 + 100MHz -3ns c1）
+│   ├── uart_send.v          # UART 并转串发送模块（参考 lha6958h-pro）
+│   └── sdram_uart_monitor.v # UART 监控与状态汇报（每秒输出测试轮数与健康度）
 ├── tb/
-│   ├── sdram_model.v     # SDRAM 行为模型（初始化序列/时序违例检查）
-│   ├── sdram_pll_sim.v   # 仿真用 PLL 行为模型（综合时删除，见 doc）
-│   ├── tb_sdram_ctrl.v   # 控制器功能测试（8 大项，3 个 seed 全过）
-│   └── tb_sdram_top.v    # 顶层集成测试（3 轮自检）
+│   ├── sdram_model.v        # SDRAM 行为模型（初始化序列/时序违例检查）
+│   ├── sdram_pll_sim.v      # 仿真用 PLL 行为模型
+│   ├── tb_sdram_ctrl.v      # 控制器功能测试（8 大项，3 个 seed 全过）
+│   └── tb_sdram_top.v       # 顶层集成测试（3 轮自检）
 ├── doc/
-│   └── PLL_设置说明.md   # MegaWizard 生成 sdram_pll 的逐步说明
-├── sdram.qsf             # 引脚约束（36 脚已确认，3 脚 TODO）
-├── sdram.sdc             # 基本时序约束
-└── README.md             # 本文件
+│   └── PLL_设置说明.md      # PLL 参数与移相计算说明
+├── sdram.qpf                # Quartus II 工程文件
+├── sdram.qsf                # 引脚约束与 IO 标准配置（已含 PIN_A13 UART）
+├── sdram.sdc                # 基本时序约束
+└── README.md                # 本文件
 ```
 
 ## 用户接口（sdram_ctrl）
@@ -98,8 +102,24 @@ BANK7：A3=C14，A2=D14，A4=A14，**CLK=B14**（PLL2 CLKOUTp 专用时钟输出
   **VCCIO1~VCCIO8 全部 3.3V**（VCC_IO 经 R9=0Ω 接 VCC3.3），BANK4/5/6/7 无误。
 - 板级引脚（原理图 `E10_________V1.1.pdf`，正点原子 E10）：
   `clk_50m`=E1（50MHz 晶振），`rst_n`=M1（RESET 按键，低有效），
-  `led_init_done`=A4（LED0），`led_err`=B5（LED1，高电平亮）。
-  板上只有 2 个 LED，自检心跳 `test_run` 在顶层悬空。
+  `led_init_done`=A4（LED0，高电平亮），`led_err`=B5（LED1，高电平亮）。
+  `uart_txd`=A13（UART 串口发送引脚，115200bps，与 lha6958h-pro 硬件一致）。
+
+## 硬件上板实测验证（2026-10-18）
+
+- **芯片**：Altera Cyclone IV E EP4CE10F17C8，SDRAM Winbond W9825G6KH-6。
+- **指示灯状态**：
+  - LED0（A4）常亮：SDRAM 200µs 等待 + PRECH ALL + 8×AREF + MRS 初始化 100% 成功。
+  - LED1（B5）保持熄灭：读写连续自检与回环比对零错误。
+- **串口实时监控（COM12，115200 8-N-1）**：
+  板载每秒自动上报测试进展与健康度：
+  ```text
+  [PASS] Rounds: 0x83C9 | Errors: 0 | SDRAM OK!
+  [PASS] Rounds: 0x887E | Errors: 0 | SDRAM OK!
+  [PASS] Rounds: 0x8D33 | Errors: 0 | SDRAM OK!
+  ```
+  实测已连续稳定跑完 **36,147 轮（累计近 1.5 亿个 16 位字随机读写与逐字校验）**，覆盖全部 4 个 Bank 轮询与高频自动刷新，**Errors 始终为 0**。
+
 
 ## 仿真验证报告（iverilog，2026-10-18）
 

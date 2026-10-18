@@ -35,7 +35,10 @@ module sdram_top (
 
     // ---- 状态 LED(板上只有 2 个,高电平亮) ----
     output wire        led_init_done, // A4:LED0,初始化完成常亮
-    output wire        led_err        // B5:LED1,粘滞错误(亮=有问题)
+    output wire        led_err,       // B5:LED1,粘滞错误(亮=有问题)
+
+    // ---- UART 串口(与 lha6958h-pro 硬件完全一致) ----
+    output wire        uart_txd       // A13:UART 发送端口 (默认 115200bps)
 );
 
     wire sys_clk;
@@ -129,6 +132,19 @@ module sdram_top (
 
     assign led_init_done = ctrl_init_done;
     assign led_err       = t_err | ctrl_err;
-    // t_run(自检心跳)板上无 LED 可接,悬空(综合会优化掉)
+
+    // UART 监控与状态输出 (参考 lha6958h-pro 架构)
+    sdram_uart_monitor #(
+        .CLK_FREQ (100_000_000),
+        .UART_BPS (115_200)
+    ) u_uart_monitor (
+        .clk        (sys_clk),
+        .rst_n      (rst_n_sync),
+        .init_done  (ctrl_init_done),
+        .test_run   (t_run),
+        .err_sticky (t_err | ctrl_err),
+        .pass_cnt   (t_pass),
+        .uart_txd   (uart_txd)
+    );
 
 endmodule

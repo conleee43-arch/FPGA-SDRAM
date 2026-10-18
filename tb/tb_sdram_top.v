@@ -39,7 +39,8 @@ module tb_sdram_top;
         .sdram_ba     (sdram_ba),
         .sdram_dq     (sdram_dq),
         .led_init_done(led_init_done),
-        .led_err      (led_err)
+        .led_err      (led_err),
+        .uart_txd     ()
     );
 
     sdram_model #(

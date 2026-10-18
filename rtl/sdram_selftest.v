@@ -87,6 +87,7 @@ module sdram_selftest #(
         end else begin
             wr_req <= 1'b0;
             rd_req <= 1'b0;
+            wr_be  <= 2'b11;
 
             // DUT 接受 req 后 busy 拉高,见到 busy 高才清除,防止连发
             if (busy)
