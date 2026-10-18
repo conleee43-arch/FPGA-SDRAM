@@ -12,6 +12,8 @@ hc_output/
 *.pin
 *.sof
 *.pof
+*.jic
+*.map
 *.jdi
 *.map.*
 *.fit.*

@@ -28,6 +28,9 @@ sdram-controller/
 ├── sdram.qpf                # Quartus II 工程文件
 ├── sdram.qsf                # 引脚约束与 IO 标准配置（已含 PIN_A13 UART）
 ├── sdram.sdc                # 基本时序约束
+├── flash_program.bat        # 板载 Flash (W25Q16/EPCS16) 一键全自动固化烧录脚本
+├── generate_jic.bat         # .sof 转 .jic 配置文件转换脚本
+├── program_flash.cdf        # Quartus 烧录链描述文件 (JTAG 间接烧录)
 └── README.md                # 本文件
 ```
 
@@ -162,6 +165,7 @@ BANK7：A3=C14，A2=D14，A4=A14，**CLK=B14**（PLL2 CLKOUTp 专用时钟输出
    按 `doc/PLL_设置说明.md` 微调 PLL 移相（±1ns）或 `RD_CAP_CYC`。
 4. 自检长期稳定后，把 `sdram_top` 里的自检模块换成你的应用逻辑
    （ADC 数据缓存等），`sdram_ctrl` 的 native 接口直接对接。
+5. **掉电固化（上电自启）**：若需掉电后不丢失程序，直接双击运行工程根目录下的 `flash_program.bat`，脚本将自动把最新的 `sdram.sof` 转换为 `sdram.jic` 并一键烧录到板载 W25Q16 (EPCS16) Flash 中。烧录完成后重新插拔电源即可脱机自启动。
 
 ## 时序参数来源（2026-10-18 已用官方手册闭环）
 
