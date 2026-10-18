@@ -1,0 +1,83 @@
+#=============================================================================
+# sdram.qsf -- EP4CE10F17C8 + W9825G6KH-6 引脚约束
+# 抄录自用户原理图截图(2026-10-18),已逐脚核对.
+# 2026-10-18 补:SDRAM_CS=K10 / SDRAM_D0=P14 / SDRAM_D6=L11(BANK4),
+#      39 根信号已齐.
+# IO 电平:SDRAM 为 3.3V 供电,全部用 3.3-V LVTTL;
+#      原理图 POWER 页确认:VCCIO1~VCCIO8 全部接 3.3V(VCC_IO 经 R9=0Ω 接 VCC3.3),
+#      BANK4/5/6/7 的 VCCIO=3.3V 无误.
+#=============================================================================
+
+set_global_assignment -name FAMILY "Cyclone IV E"
+set_global_assignment -name DEVICE EP4CE10F17C8
+set_global_assignment -name TOP_LEVEL_ENTITY sdram_top
+
+#---------------- BANK5: 数据低字节/控制 ----------------
+set_location_assignment PIN_M12 -to sdram_dq[1]   ;# SDRAM_D1
+set_location_assignment PIN_L12 -to sdram_dq[3]   ;# SDRAM_D3
+set_location_assignment PIN_K12 -to sdram_dq[7]   ;# SDRAM_D7
+set_location_assignment PIN_N14 -to sdram_dq[2]   ;# SDRAM_D2
+set_location_assignment PIN_K11 -to sdram_ras_n   ;# SDRAM_RAS
+set_location_assignment PIN_L14 -to sdram_dq[5]   ;# SDRAM_D5
+set_location_assignment PIN_L13 -to sdram_dq[4]   ;# SDRAM_D4
+set_location_assignment PIN_L16 -to sdram_dq[14]  ;# SDRAM_D14
+set_location_assignment PIN_L15 -to sdram_dq[15]  ;# SDRAM_D15
+set_location_assignment PIN_J11 -to sdram_dq[9]   ;# SDRAM_D9
+set_location_assignment PIN_K16 -to sdram_dq[12]  ;# SDRAM_D12
+set_location_assignment PIN_K15 -to sdram_dq[13]  ;# SDRAM_D13
+set_location_assignment PIN_J16 -to sdram_dq[10]  ;# SDRAM_D10
+set_location_assignment PIN_J15 -to sdram_dq[11]  ;# SDRAM_D11
+set_location_assignment PIN_J14 -to sdram_dqm[0]  ;# SDRAM_DQM0
+set_location_assignment PIN_J12 -to sdram_cas_n   ;# SDRAM_CAS
+set_location_assignment PIN_J13 -to sdram_we_n    ;# SDRAM_WE
+
+#---------------- BANK6: 数据高字节/DQM1/地址高位/控制 ----------------
+set_location_assignment PIN_G16 -to sdram_dq[8]   ;# SDRAM_D8
+set_location_assignment PIN_G15 -to sdram_dqm[1]  ;# SDRAM_DQM1
+set_location_assignment PIN_F13 -to sdram_ba[1]   ;# SDRAM_BA1
+set_location_assignment PIN_F16 -to sdram_cke      ;# SDRAM_CKE
+set_location_assignment PIN_F15 -to sdram_a[12]   ;# SDRAM_A12
+set_location_assignment PIN_B16 -to sdram_a[6]    ;# SDRAM_A6
+set_location_assignment PIN_F14 -to sdram_a[10]   ;# SDRAM_A10
+set_location_assignment PIN_D16 -to sdram_a[11]   ;# SDRAM_A11
+set_location_assignment PIN_D15 -to sdram_a[9]    ;# SDRAM_A9
+set_location_assignment PIN_G11 -to sdram_ba[0]   ;# SDRAM_BA0
+set_location_assignment PIN_C16 -to sdram_a[8]    ;# SDRAM_A8
+set_location_assignment PIN_C15 -to sdram_a[7]    ;# SDRAM_A7
+
+#---------------- BANK7: 地址低位/时钟 ----------------
+set_location_assignment PIN_C14 -to sdram_a[3]    ;# SDRAM_A3
+set_location_assignment PIN_D14 -to sdram_a[2]    ;# SDRAM_A2
+set_location_assignment PIN_A14 -to sdram_a[4]    ;# SDRAM_A4
+set_location_assignment PIN_B14 -to sdram_clk      ;# SDRAM_CLK(PLL2 CLKOUTp 专用脚)
+set_location_assignment PIN_E11 -to sdram_a[1]    ;# SDRAM_A1
+set_location_assignment PIN_F11 -to sdram_a[0]    ;# SDRAM_A0
+set_location_assignment PIN_A15 -to sdram_a[5]    ;# SDRAM_A5
+
+#---------------- BANK4: 片选 + 数据位 0/6(2026-10-18 补充截图确认) ----------------
+set_location_assignment PIN_K10 -to sdram_cs_n   ;# SDRAM_CS
+set_location_assignment PIN_P14 -to sdram_dq[0]  ;# SDRAM_D0
+set_location_assignment PIN_L11 -to sdram_dq[6]  ;# SDRAM_D6
+
+#---------------- 时钟/复位/LED:正点原子 E10(原理图 E10_________V1.1) ----------------
+set_location_assignment PIN_E1 -to clk_50m      ;# 50MHz 晶振 FPGA_CLK
+set_location_assignment PIN_M1 -to rst_n        ;# RESET 按键,低有效(10K 上拉)
+set_location_assignment PIN_A4 -to led_init_done ;# LED0,高电平亮
+set_location_assignment PIN_B5 -to led_err       ;# LED1,高电平亮
+# 注:板上只有 2 个 LED,自检心跳 test_run 无处可接,已在顶层悬空.
+
+#---------------- IO 标准 ----------------
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdram_dq[*]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdram_a[*]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdram_ba[*]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdram_dqm[*]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdram_clk
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdram_cke
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdram_ras_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdram_cas_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdram_we_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to sdram_cs_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clk_50m
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rst_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to led_init_done
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to led_err

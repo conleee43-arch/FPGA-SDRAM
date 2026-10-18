@@ -1,0 +1,35 @@
+# Quartus compilation and database files
+db/
+incremental_db/
+output_files/
+greybox_tmp/
+hc_output/
+*.qws
+*.rpt
+*.summary
+*.smsg
+*.done
+*.pin
+*.sof
+*.pof
+*.jdi
+*.map.*
+*.fit.*
+*.asm.*
+*.tan.*
+*.sta.*
+*.eda.*
+
+# Simulation files
+*.vcd
+*.vvp
+*.log
+work/
+transcript
+vsim.wlf
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+*.bak
+*.orig
