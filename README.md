@@ -157,8 +157,7 @@ BANK7：A3=C14，A2=D14，A4=A14，**CLK=B14**（PLL2 CLKOUTp 专用时钟输出
 
 ## 上板步骤
 
-1. 用 MegaWizard 按 `doc/PLL_设置说明.md` 生成 `sdram_pll`，
-   **删除 `tb/sdram_pll_sim.v`**（只留一个同名模块）。
+1. 工程已内置生成好的 `rtl/sdram_pll.v`，直接使用即可；如需调整移相参数可参考 `doc/PLL_设置说明.md`。
 2. 综合、下载。观察 LED：LED0（A4）常亮 → 初始化 OK；LED1（B5）亮 →
    有数据错误（粘滞，需按复位键 M1 清除）。
 3. 让自检连续跑至少几分钟（覆盖多次刷新和 bank 轮询）。如果 LED1 亮，

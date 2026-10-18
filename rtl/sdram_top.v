@@ -6,9 +6,8 @@
 //  LED 指示:LED0(A4)常亮=初始化完成;LED1(B5)亮=粘滞错误.
 //
 //  注意:
-//   * sdram_pll 需用 Quartus MegaWizard 按 doc/PLL_设置说明.md 生成,
-//     仿真时用 tb/sdram_pll_sim.v(同名模块)替代,综合时删除后者.
-//  板级引脚已按正点原子 E10 原理图(E10_________V1.1.pdf)确认,见 sdram.qsf.
+//   * 已包含 rtl/sdram_pll.v (ALTPLL: 50MHz -> 100MHz 系统时钟 + 100MHz -3ns SDRAM 时钟).
+//   * 板级引脚已按正点原子 E10 原理图(E10_________V1.1.pdf)确认,见 sdram.qsf.
 
 //-----------------------------------------------------------------------------
 //  Revision:
